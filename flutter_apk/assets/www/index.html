@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<title>ShopBooks</title>
+<style>
+:root{--p:#0f766e;--bg:#f4f6f8;--card:#fff;--tx:#0f172a;--mut:#64748b;--red:#dc2626;--grn:#16a34a;--bd:#e2e8f0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:84px}
+html[lang=ur] body{font-family:"Noto Naskh Arabic","Noto Nastaliq Urdu",system-ui,sans-serif;line-height:1.7}
+header{position:sticky;top:0;z-index:5;background:var(--p);color:#fff;padding:12px 16px;font-weight:700;font-size:18px;padding-top:max(12px,env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:center}
+.hb button{border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:8px;font-size:16px;padding:4px 9px;margin-inline-start:6px}
+main{padding:12px;max-width:720px;margin:0 auto}
+.card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card h3{margin:0 0 6px}
+h4{margin:14px 0 4px;color:var(--mut);text-transform:uppercase;font-size:12px;letter-spacing:.5px}
+small{display:block;color:var(--mut);font-size:12px}
+.mut{color:var(--mut)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{background:var(--card);border-radius:14px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.stat span{display:block;color:var(--mut);font-size:12px}
+.stat b{font-size:18px}
+.stat.wide{grid-column:1/-1;background:var(--p);color:#fff}
+.stat.wide span{color:#cdeee9}.stat.wide b{font-size:26px}
+.pos{color:var(--grn)}.neg{color:var(--red)}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--bd);cursor:pointer}
+.row:last-child{border-bottom:0}
+.row b{font-weight:600}
+.amt{font-weight:700;white-space:nowrap}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;font-weight:600}
+.b-paid{background:#dcfce7;color:#166534}.b-part{background:#fef3c7;color:#92400e}.b-un{background:#e0e7ff;color:#3730a3}.b-od{background:#fee2e2;color:#991b1b}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--bd);display:flex;z-index:6;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;border:0;background:none;padding:9px 0 8px;font:inherit;font-size:11px;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button i{font-style:normal;font-size:20px}
+nav button.on{color:var(--p);font-weight:700}
+.fab{position:fixed;inset-inline-end:16px;bottom:calc(76px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;border:0;background:var(--p);color:#fff;font-size:30px;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:7}
+#modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:flex-end;justify-content:center;z-index:20}
+#modal.on{display:flex}
+.sheet{background:#fff;width:100%;max-width:720px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom))}
+.sheet h3{margin:0 0 10px}
+label{display:block;font-size:12px;color:var(--mut);margin:10px 0 3px;font-weight:600}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;font:inherit;background:#fff;color:var(--tx)}
+.btn{width:100%;padding:12px;border:0;border-radius:10px;background:var(--p);color:#fff;font:inherit;font-weight:700;margin-top:12px;display:block}
+.btn.sec{background:#e2e8f0;color:var(--tx)}.btn.red{background:#fee2e2;color:#991b1b}
+.btns{display:flex;gap:8px}.btns .btn{flex:1}
+.chips{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;padding-bottom:2px}
+.chip{border:1px solid var(--bd);background:#fff;border-radius:99px;padding:7px 13px;white-space:nowrap;font:inherit;font-size:13px}
+.chip.on{background:var(--p);color:#fff;border-color:var(--p)}
+.dates{display:flex;gap:10px}.dates label{flex:1;margin:0}
+.ln{display:flex;justify-content:space-between;padding:5px 0}
+.ln.tt{border-top:1px solid var(--bd);font-weight:700}
+.tot.big{display:flex;justify-content:space-between;font-size:18px;font-weight:800;border-top:2px solid var(--tx);margin-top:12px;padding-top:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:6px 4px;text-align:end;border-bottom:1px solid var(--bd)}
+th:first-child,td:first-child{text-align:start}
+.jr,.ir{display:grid;grid-template-columns:1fr 1fr 30px;gap:6px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--bd)}
+.jr select,.ir .d,.ir select{grid-column:1/-1}
+.br{grid-template-columns:1fr 1fr 30px}
+.x{border:0;background:#fee2e2;color:#991b1b;border-radius:8px;font-size:18px}
+.diff{font-weight:700;margin-top:6px}
+#toast{position:fixed;left:50%;bottom:150px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 16px;border-radius:99px;z-index:40;display:none;font-size:13px;max-width:90%;text-align:center}
+#print{display:none}
+.search{margin-bottom:10px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:6px;margin:8px 0;max-height:170px;overflow:auto}
+.pi{border:1px solid var(--bd);background:#f8fafc;border-radius:10px;padding:8px;text-align:start;font:inherit}
+.pi b{display:block;font-size:13px}.pi small{font-size:11px}
+.cl{display:grid;grid-template-columns:1fr auto 80px 30px;gap:6px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--bd)}
+.cl .cq{display:flex;align-items:center;gap:3px}
+.cl .cq button{width:28px;height:30px;border:0;border-radius:6px;background:#e2e8f0;font-size:16px}
+.cl .cq input{width:48px;padding:6px 2px;text-align:center}
+.cl .cp{padding:6px}
+.low{color:var(--red);font-weight:700}
+#lock{position:fixed;inset:0;background:var(--p);z-index:100;display:none;align-items:center;justify-content:center;color:#fff}
+.lk{text-align:center;width:min(300px,86vw)}
+.dots{display:flex;justify-content:center;gap:14px;margin:14px 0 22px}
+.dots i{width:14px;height:14px;border-radius:50%;border:2px solid #fff}.dots i.on{background:#fff}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.kp button{height:62px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:24px}
+@media print{
+ body>*:not(#print){display:none!important}
+ #print{display:block;padding:20px;color:#000;background:#fff}
+ #print .card{box-shadow:none;border:0;padding:0}
+}
+</style>
+</head>
+<body>
+<header><span id="bn">ShopBooks</span><span class="hb" id="hb"></span></header>
+<main id="app"></main>
+<button class="fab" onclick="openAdd()" aria-label="Add">+</button>
+<nav>
+ <button data-t="home" onclick="go('home')"><i>🏠</i><span data-k="Home">Home</span></button>
+ <button data-t="sales" onclick="go('sales')"><i>🧾</i><span data-k="Sales">Sales</span></button>
+ <button data-t="stock" onclick="go('stock')"><i>📦</i><span data-k="Stock">Stock</span></button>
+ <button data-t="khata" onclick="go('khata')"><i>👥</i><span data-k="Khata">Khata</span></button>
+ <button data-t="reps" onclick="go('reps')"><i>📊</i><span data-k="Reports">Reports</span></button>
+</nav>
+<div id="modal" onclick="if(event.target===this)closeM()"></div>
+<div id="toast"></div>
+<div id="print"></div>
+<div id="lock"></div>
+
+<script>
+/* =================== storage =================== */
+const KEY='shopbooks.v2',DKEY='shopbooks.dev';
+const DEF=[
+['1000','Cash','asset'],['1010','Bank','asset'],['1100','Accounts Receivable','asset'],['1200','Inventory','asset'],
+['2000','Accounts Payable','liability'],['2100','Sales Tax Payable','liability'],
+['3000',"Owner's Capital",'equity'],['3100',"Owner's Drawings",'equity'],
+['4000','Sales Revenue','income'],['4100','Other Income','income'],
+['5000','Cost of Goods Sold','expense'],['5100','Rent','expense'],['5200','Salaries & Wages','expense'],
+['5300','Utilities','expense'],['5400','Transport','expense'],['5500','Other Expenses','expense']
+];
+const COLL=['accounts','entries','invoices','bills','parties','items','adjusts'];
+const baseSettings=()=>({name:'My Shop',cur:'Rs',tax:0,prefix:'INV-',next:1,billPrefix:'BILL-',nextBill:1,addr:'',u:0});
+function fresh(){return{v:2,settings:baseSettings(),accounts:DEF.map(([id,name,type])=>({id,name,type,sys:1,u:0})),entries:[],invoices:[],bills:[],parties:[],items:[],adjusts:[],del:{}}}
+function norm(j){const f=fresh();j.settings=Object.assign(baseSettings(),j.settings||{});
+ COLL.forEach(c=>{j[c]=Array.isArray(j[c])?j[c]:(j[c]?Object.values(j[c]):[])});j.del=j.del||{};
+ j.invoices.forEach(i=>{i.payments=Array.isArray(i.payments)?i.payments:[];i.items=i.items||[]});
+ j.bills.forEach(b=>{b.payments=Array.isArray(b.payments)?b.payments:[];b.items=b.items||[]});
+ j.entries.forEach(e=>{e.lines=e.lines||[]});
+ f.accounts.forEach(a=>{if(!j.accounts.some(x=>x.id===a.id))j.accounts.push(a)});j.v=2;return j}
+function load(){for(const k of [KEY,'shopbooks.v1']){try{const j=JSON.parse(localStorage.getItem(k));if(j&&j.accounts)return norm(j)}catch(e){}}return fresh()}
+let S=load();
+const devDef=()=>({lang:'en',pinOn:false,pin:'',salt:'',bio:'',sync:{url:'',code:'',last:0}});
+function loadDev(){try{const d=Object.assign(devDef(),JSON.parse(localStorage.getItem(DKEY))||{});d.sync=Object.assign(devDef().sync,d.sync||{});return d}catch(e){return devDef()}}
+let dev=loadDev();
+function saveDev(){try{localStorage.setItem(DKEY,JSON.stringify(dev))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Could not save (storage full)')}scheduleSync()}
+function put(c,rec){rec.u=Date.now();const a=S[c];const i=a.findIndex(x=>x.id===rec.id);if(i<0)a.push(rec);else a[i]=rec;return rec}
+function stamp(rec){rec.u=Date.now();return rec}
+function rm(c,id){S[c]=S[c].filter(x=>x.id!==id);S.del[id]=Date.now()}
+function rmEntries(ref){S.entries.filter(e=>e.ref===ref).forEach(e=>rm('entries',e.id))}
+
+/* =================== helpers =================== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-3);
+const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
+const r4=n=>Math.round(n*10000)/10000;
+const tzOff=()=>new Date().getTimezoneOffset()*60000;
+const today=()=>new Date(Date.now()-tzOff()).toISOString().slice(0,10);
+const addDays=n=>new Date(Date.now()+n*864e5-tzOff()).toISOString().slice(0,10);
+const monthStart=()=>today().slice(0,8)+'01';
+const fmt=n=>S.settings.cur+' '+Number(n||0).toLocaleString('en-US',{maximumFractionDigits:2});
+const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0};
+const acct=id=>S.accounts.find(a=>a.id===id)||{id,name:'(deleted)',type:'asset'};
+const isDr=a=>a.type==='asset'||a.type==='expense';
+const byDate=(a,b)=>a.date<b.date?-1:a.date>b.date?1:0;
+const T=s=>(dev.lang==='ur'&&UR[s])?UR[s]:s;
+function toast(m){const t=$('#toast');t.textContent=T(m);t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',2400)}
+function sums(to,from){const m={};for(const e of S.entries){if(to&&e.date>to)continue;if(from&&e.date<from)continue;
+ for(const l of e.lines){const o=m[l.acc]||(m[l.acc]={dr:0,cr:0});o.dr+=l.dr||0;o.cr+=l.cr||0}}return m}
+function natural(a,o){o=o||{dr:0,cr:0};return isDr(a)?o.dr-o.cr:o.cr-o.dr}
+function accOpts(fn,sel){return S.accounts.filter(fn).sort((a,b)=>a.id<b.id?-1:1).map(a=>`<option value="${esc(a.id)}" ${a.id===sel?'selected':''}>${esc(a.name)}</option>`).join('')}
+const payAccts=a=>a.type==='asset'&&a.id!=='1100'&&a.id!=='1200';
+const entryAmt=e=>round2(e.lines.reduce((t,l)=>t+(l.dr||0),0));
+const paidOf=d=>round2((d.payments||[]).reduce((t,p)=>t+p.amt,0));
+const dueOf=d=>round2(d.total-paidOf(d));
+function status(d){const x=dueOf(d);if(x<=0.004)return['Paid','b-paid'];if(d.due<today())return['Overdue','b-od'];return paidOf(d)>0?['Partial','b-part']:['Unpaid','b-un']}
+const native=()=>window.flutter_inappwebview&&window.flutter_inappwebview.callHandler?window.flutter_inappwebview:null;
+const b64=buf=>btoa(String.fromCharCode(...new Uint8Array(buf)));
+const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+
+/* =================== stock (derived from movements) =================== */
+function moves(id){const m=[];
+ S.bills.forEach(b=>b.items.forEach(l=>{if(l.itemId===id)m.push({d:b.date,t:b.ts||0,q:l.q,p:l.p})}));
+ S.invoices.forEach(i=>i.items.forEach(l=>{if(l.itemId===id)m.push({d:i.date,t:i.ts||0,q:-l.q,p:null})}));
+ S.adjusts.forEach(a=>{if(a.itemId===id)m.push({d:a.date,t:a.ts||0,q:a.q,p:a.q>0?a.cost:null})});
+ return m.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:a.t-b.t)}
+function stockOf(it){let q=it.open||0;moves(it.id).forEach(m=>q+=m.q);return round2(q)}
+function avgCost(it){let q=it.open||0,c=it.cost||0;for(const m of moves(it.id)){if(m.q>0&&m.p!=null){c=q>0?(q*c+m.q*m.p)/(q+m.q):m.p}q+=m.q}return r4(c)}
+function stockValue(){return round2(S.items.reduce((t,i)=>{const q=stockOf(i);return t+(q>0?q*avgCost(i):0)},0))}
+const isLow=i=>i.reorder>0&&stockOf(i)<=i.reorder;
+
+/* =================== posting engine =================== */
+function iCalc(items,tp){const sub=round2(items.reduce((t,x)=>t+x.q*x.p,0));const tax=round2(sub*tp/100);return{sub,tax,total:round2(sub+tax)}}
+function addPay(kind,doc,amt,date,acc){const ar=kind==='inv';const eid=uid();const who=ar?doc.customer:doc.supplier;
+ put('entries',{id:eid,date,desc:(ar?'Payment ':'Paid ')+doc.no+' – '+who,kind:ar?'payment':'billpay',ref:doc.id,
+  lines:ar?[{acc,dr:amt,cr:0},{acc:'1100',dr:0,cr:amt}]:[{acc:'2000',dr:amt,cr:0},{acc,dr:0,cr:amt}]});
+ doc.payments.push({id:uid(),date,amt,entryId:eid});stamp(doc)}
+function createInvoice(o){
+ const items=o.items.map(l=>{const it=l.itemId&&S.items.find(x=>x.id===l.itemId);return{itemId:l.itemId||'',d:l.d,q:l.q,p:l.p,cost:it?avgCost(it):0}});
+ const c=iCalc(items,o.taxPct);const id=uid();
+ const no=S.settings.prefix+String(S.settings.next).padStart(4,'0');S.settings.next++;S.settings.u=Date.now();
+ const cogs=round2(items.reduce((t,l)=>t+(l.itemId?l.q*l.cost:0),0));
+ const lines=[{acc:'1100',dr:c.total,cr:0},{acc:'4000',dr:0,cr:c.sub}];
+ if(c.tax>0)lines.push({acc:'2100',dr:0,cr:c.tax});
+ if(cogs>0)lines.push({acc:'5000',dr:cogs,cr:0},{acc:'1200',dr:0,cr:cogs});
+ put('entries',{id:uid(),date:o.date,desc:`Sale ${no} – ${o.customer}`,kind:'invoice',ref:id,lines});
+ const inv=put('invoices',{id,ts:Date.now(),no,date:o.date,due:o.due,customer:o.customer,partyId:o.partyId||'',items,taxPct:o.taxPct,sub:c.sub,tax:c.tax,total:c.total,note:o.note||'',payments:[]});
+ if(o.recv>0.004)addPay('inv',inv,round2(o.recv),o.date,o.payAcc);
+ return inv}
+function createBill(o){
+ const dr={};o.items.forEach(l=>{const a=l.itemId?'1200':l.acc;dr[a]=round2((dr[a]||0)+l.q*l.p)});
+ const sub=round2(Object.values(dr).reduce((t,v)=>t+v,0));const tax=round2(sub*o.taxPct/100);const total=round2(sub+tax);
+ const id=uid();const no=S.settings.billPrefix+String(S.settings.nextBill).padStart(4,'0');S.settings.nextBill++;S.settings.u=Date.now();
+ const lines=Object.entries(dr).map(([acc,v])=>({acc,dr:v,cr:0}));if(tax>0)lines.push({acc:'2100',dr:tax,cr:0});lines.push({acc:'2000',dr:0,cr:total});
+ put('entries',{id:uid(),date:o.date,desc:`Purchase ${no} – ${o.supplier}`,kind:'bill',ref:id,lines});
+ const b=put('bills',{id,ts:Date.now(),no,ref:o.ref||'',date:o.date,due:o.due,supplier:o.supplier,partyId:o.partyId||'',items:o.items.map(l=>({itemId:l.itemId||'',d:l.d,acc:l.acc||'',q:l.q,p:l.p})),taxPct:o.taxPct,sub,tax,total,note:o.note||'',payments:[]});
+ if(o.paid>0.004)addPay('bill',b,round2(o.paid),o.date,o.payAcc);
+ return b}
+const partyDocs=p=>p.type==='supplier'?S.bills.filter(b=>b.partyId===p.id):S.invoices.filter(i=>i.partyId===p.id);
+const partyBal=p=>round2(partyDocs(p).reduce((t,d)=>t+dueOf(d),0));
+function partyPay(p,amt,acc,date){let left=amt;
+ for(const d of partyDocs(p).filter(d=>dueOf(d)>0.004).sort(byDate)){if(left<=0.004)break;const a=round2(Math.min(left,dueOf(d)));addPay(p.type==='supplier'?'bill':'inv',d,a,date,acc);left=round2(left-a)}}
+
+/* =================== ui state =================== */
+const V={tab:'home',rep:'pl',from:monthStart(),to:today(),lacc:'1000',q:'',stk:'items',kh:'customer'};
+let CB=null,CART=[],RECV_AUTO=true;
+function go(t){V.tab=t;render()}
+function hdr(){$('#bn').textContent=S.settings.name||'ShopBooks';
+ $('#hb').innerHTML=(dev.pinOn?'<button onclick="lockNow()">🔒</button>':'')+(syncCfg()?'<button onclick="syncNow(true)">⟳</button>':'')+'<button onclick="go(\'more\')">⚙️</button>'}
+function render(keep){const y=window.scrollY;$('#app').innerHTML=views[V.tab]();tr($('#app'));
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===V.tab));hdr();window.scrollTo(0,keep?y:0)}
+function modal(h){$('#modal').innerHTML='<div class="sheet">'+h+'</div>';tr($('#modal'));$('#modal').classList.add('on')}
+function closeM(){$('#modal').classList.remove('on');$('#modal').innerHTML=''}
+function ask(msg,fn){CB=fn;modal(`<h3>${esc(msg)}</h3><div class="btns"><button class="btn sec" onclick="closeM()">Cancel</button><button class="btn red" onclick="closeM();CB&&CB()">Confirm</button></div>`)}
+function printHTML(h){const n=native();if(n){n.callHandler('printHtml','<html><head><meta charset="utf-8"><style>body{font:14px sans-serif}table{width:100%;border-collapse:collapse}th,td{padding:4px;border-bottom:1px solid #ddd;text-align:left}.ln{display:flex;justify-content:space-between}</style></head><body>'+h+'</body></html>');return}
+ $('#print').innerHTML=h;window.print()}
+function openUrl(u){const n=native();if(n)n.callHandler('openUrl',u);else window.open(u,'_blank')}
+
+/* =================== language =================== */
+const UR={
+'Home':'ہوم','Sales':'فروخت','Stock':'اسٹاک','Khata':'کھاتہ','Reports':'رپورٹس',
+'Cash & bank':'نقد اور بینک','Owed to you':'آپ کو وصول ہونے والی رقم','You owe suppliers':'سپلائرز کو ادائیگی','Stock value':'اسٹاک کی مالیت','Low stock items':'کم اسٹاک اشیاء','Overdue invoices':'تاخیر شدہ انوائسز',
+'Income this month':'اس ماہ کی آمدنی','Expenses this month':'اس ماہ کے اخراجات','Profit this month':'اس ماہ کا منافع','Recent activity':'حالیہ سرگرمی',
+'Nothing yet. Tap + to record your first sale or expense.':'ابھی کچھ نہیں۔ پہلی فروخت یا خرچ درج کرنے کے لیے + دبائیں۔',
+'Quick sale':'فوری فروخت','Add expense':'خرچ شامل کریں','Receive payment':'رقم وصول کریں',
+'Add':'شامل کریں','Sale / invoice':'فروخت / انوائس','Income received':'وصول شدہ آمدنی','Expense':'خرچ','Purchase bill':'خریداری بل','Receive customer payment':'گاہک سے وصولی','Pay supplier':'سپلائر کو ادائیگی','New item':'نیا آئٹم','New customer / supplier':'نیا گاہک / سپلائر','Journal entry (debit / credit)':'جرنل اندراج (ڈیبٹ / کریڈٹ)',
+'Amount':'رقم','Date':'تاریخ','Note':'نوٹ','Save':'محفوظ کریں','Cancel':'منسوخ','Close':'بند کریں','Delete':'حذف کریں','Edit':'ترمیم','Confirm':'تصدیق','Description':'تفصیل','Debit':'ڈیبٹ','Credit':'کریڈٹ','Account':'اکاؤنٹ','Total':'کل','Balance':'بیلنس','Due':'آخری تاریخ','Name':'نام','Phone':'فون',
+'Record income':'آمدنی درج کریں','Record expense':'خرچ درج کریں','Income category':'آمدنی کی قسم','Expense category':'خرچ کی قسم','Received into':'وصولی کا اکاؤنٹ','Paid from':'ادائیگی کا اکاؤنٹ',
+'Journal entry':'جرنل اندراج','Lines':'سطریں','+ Add line':'+ سطر شامل کریں','Save entry':'اندراج محفوظ کریں',
+'Search journal…':'جرنل تلاش کریں…','Search…':'تلاش کریں…','No entries found.':'کوئی اندراج نہیں ملا۔',
+'New sale':'نئی فروخت','+ Custom item':'+ دستی آئٹم','Tap items to add them to the sale.':'فروخت میں شامل کرنے کے لیے آئٹم دبائیں۔','Customer':'گاہک','Walk-in customer':'عام گاہک','…or type a new customer name':'…یا نئے گاہک کا نام لکھیں','Sales tax %':'سیلز ٹیکس %','Amount received now':'ابھی وصول شدہ رقم','Complete sale':'فروخت مکمل کریں','Item':'آئٹم','Qty':'مقدار','Price':'قیمت',
+'Sales':'فروخت','No sales yet. Tap + to make one.':'ابھی کوئی فروخت نہیں۔','Paid':'ادا شدہ','Unpaid':'غیر ادا شدہ','Partial':'جزوی','Overdue':'تاخیر شدہ',
+'Subtotal':'ذیلی کل','Balance due':'واجب الادا رقم','Record payment':'ادائیگی درج کریں','Print / PDF':'پرنٹ / PDF','Share':'شیئر کریں','Delete invoice':'انوائس حذف کریں','Save payment':'ادائیگی محفوظ کریں',
+'Items':'آئٹمز','Purchases':'خریداریاں','+ New item':'+ نیا آئٹم','+ New purchase':'+ نئی خریداری','Stock value':'اسٹاک کی مالیت','No items yet.':'ابھی کوئی آئٹم نہیں۔','No purchases yet.':'ابھی کوئی خریداری نہیں۔',
+'Item name':'آئٹم کا نام','Unit (pcs, kg…)':'اکائی (عدد، کلو…)','Cost price':'لاگت قیمت','Selling price':'فروخت قیمت','Opening stock':'ابتدائی اسٹاک','Reorder level':'کم از کم اسٹاک کی حد','Adjust stock':'اسٹاک ایڈجسٹ کریں','Quantity change (+/−)':'مقدار میں تبدیلی (+/−)','In stock':'اسٹاک میں','Average cost':'اوسط لاگت','Low':'کم',
+'New purchase':'نئی خریداری','Supplier':'سپلائر','No supplier (cash purchase)':'کوئی سپلائر نہیں (نقد خریداری)','…or type a new supplier name':'…یا نئے سپلائر کا نام لکھیں','Amount paid now':'ابھی ادا کی گئی رقم','Paid from':'ادائیگی کا اکاؤنٹ','Save purchase':'خریداری محفوظ کریں','+ Add line':'+ سطر شامل کریں','Expense / other':'خرچ / دیگر','Cost each':'فی اکائی لاگت',
+'Customers':'گاہک','Suppliers':'سپلائرز','+ New customer':'+ نیا گاہک','+ New supplier':'+ نیا سپلائر','owes you':'آپ کا مقروض','you owe':'آپ کے ذمے','Settled':'حساب برابر','Nobody here yet.':'ابھی کوئی نہیں۔',
+'Customer / supplier':'گاہک / سپلائر','Type':'قسم','Customer':'گاہک','Statement':'اسٹیٹمنٹ','WhatsApp reminder':'واٹس ایپ یاد دہانی','Receive payment':'رقم وصول کریں','Pay supplier':'سپلائر کو ادائیگی',
+'Profit & Loss':'نفع و نقصان','Balance Sheet':'بیلنس شیٹ','Trial Balance':'ٹرائل بیلنس','Ledger':'لیجر','Tax':'ٹیکس','Journal':'جرنل','Income':'آمدنی','Expenses':'اخراجات','Total income':'کل آمدنی','Total expenses':'کل اخراجات','Net profit':'خالص منافع','Net loss':'خالص نقصان','Assets':'اثاثے','Liabilities':'واجبات','Equity':'ایکویٹی','Total assets':'کل اثاثے','Total liabilities':'کل واجبات','Total equity':'کل ایکویٹی','From':'از','To':'تا','As of':'بتاریخ','Print / Save as PDF':'پرنٹ / PDF محفوظ کریں','None':'کوئی نہیں','Opening':'ابتدائی',
+'Sales tax collected (output)':'وصول شدہ سیلز ٹیکس (آؤٹ پٹ)','Tax paid on purchases (input)':'خریداری پر ادا شدہ ٹیکس (ان پٹ)','Net tax payable':'قابلِ ادائیگی خالص ٹیکس','Taxable sales':'قابلِ ٹیکس فروخت','Taxable purchases':'قابلِ ٹیکس خریداری','Rate':'شرح','Tax amount':'ٹیکس کی رقم',
+'Cash':'نقد','Bank':'بینک','Accounts Receivable':'قابلِ وصول رقوم','Inventory':'انوینٹری','Accounts Payable':'قابلِ ادائیگی رقوم','Sales Tax Payable':'قابلِ ادائیگی سیلز ٹیکس',"Owner's Capital":'مالک کا سرمایہ',"Owner's Drawings":'مالک کی نکاسی','Sales Revenue':'فروخت کی آمدنی','Other Income':'دیگر آمدنی','Cost of Goods Sold':'فروخت شدہ مال کی لاگت','Rent':'کرایہ','Salaries & Wages':'تنخواہیں اور اجرتیں','Utilities':'یوٹیلیٹیز','Transport':'ٹرانسپورٹ','Other Expenses':'دیگر اخراجات',
+'Business':'کاروبار','Business name':'کاروبار کا نام','Address / phone (shown on invoices)':'پتہ / فون (انوائس پر)','Language':'زبان','Currency symbol':'کرنسی کی علامت','Default sales tax %':'ڈیفالٹ سیلز ٹیکس %','Invoice prefix':'انوائس کا سابقہ','Save settings':'ترتیبات محفوظ کریں',
+'Security':'سیکیورٹی','Set / change PIN':'پن لگائیں / تبدیل کریں','Remove PIN':'پن ہٹائیں','Enable fingerprint':'فنگر پرنٹ فعال کریں','New PIN (4 digits)':'نیا پن (4 ہندسے)','Repeat PIN':'پن دوبارہ لکھیں','Enter PIN':'پن درج کریں',
+'Cloud sync':'کلاؤڈ سنک','Database URL':'ڈیٹا بیس URL','Sync code (keep secret)':'سنک کوڈ (خفیہ رکھیں)','Save & sync':'محفوظ کریں اور سنک کریں','Sync now':'ابھی سنک کریں','Generate code':'کوڈ بنائیں',
+'Data':'ڈیٹا','Download backup (JSON)':'بیک اپ ڈاؤن لوڈ کریں (JSON)','Export journal (CSV)':'جرنل ایکسپورٹ کریں (CSV)','Restore from backup':'بیک اپ سے بحال کریں','Erase all data':'تمام ڈیٹا مٹائیں','Chart of accounts':'اکاؤنٹس کی فہرست','+ Add account':'+ اکاؤنٹ شامل کریں','New account':'نیا اکاؤنٹ',
+'Saved':'محفوظ ہو گیا','Enter an amount':'رقم درج کریں','Wrong PIN':'غلط پن','Synced':'سنک مکمل','Settings saved':'ترتیبات محفوظ ہوئیں'
+};
+function tr(root){if(dev.lang!=='ur'||!root)return;
+ const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const list=[];let n;while((n=w.nextNode()))list.push(n);
+ list.forEach(n=>{const s=n.nodeValue.trim();if(s&&UR[s])n.nodeValue=n.nodeValue.replace(s,UR[s])});
+ root.querySelectorAll('[placeholder]').forEach(e=>{const p=e.getAttribute('placeholder');if(UR[p])e.setAttribute('placeholder',UR[p])})}
+function applyLang(){document.documentElement.lang=dev.lang;document.documentElement.dir=dev.lang==='ur'?'rtl':'ltr';
+ document.querySelectorAll('[data-k]').forEach(e=>e.textContent=T(e.dataset.k))}
+function setLang(l){dev.lang=l;saveDev();applyLang();render(true)}
+
+/* =================== views =================== */
+function home(){const all=sums();
+ const cash=S.accounts.filter(payAccts).reduce((t,a)=>t+natural(a,all[a.id]),0);
+ const ar=natural(acct('1100'),all['1100']),ap=natural(acct('2000'),all['2000']);
+ const m=sums(null,monthStart());let inc=0,exp=0;
+ S.accounts.forEach(a=>{if(a.type==='income')inc+=natural(a,m[a.id]);if(a.type==='expense')exp+=natural(a,m[a.id])});
+ const od=S.invoices.filter(i=>dueOf(i)>0.004&&i.due<today()).length;const low=S.items.filter(isLow).length;
+ const recent=[...S.entries].sort(byDate).reverse().slice(0,6);
+ return `<div class="grid">
+ <div class="stat wide"><span>Cash & bank</span><b>${fmt(round2(cash))}</b></div>
+ <div class="stat"><span>Owed to you</span><b>${fmt(round2(ar))}</b></div>
+ <div class="stat"><span>You owe suppliers</span><b>${fmt(round2(ap))}</b></div>
+ <div class="stat"><span>Stock value</span><b>${fmt(stockValue())}</b></div>
+ <div class="stat"><span>Low stock items</span><b class="${low?'neg':''}">${low}</b></div>
+ <div class="stat"><span>Income this month</span><b class="pos">${fmt(round2(inc))}</b></div>
+ <div class="stat"><span>Expenses this month</span><b class="neg">${fmt(round2(exp))}</b></div>
+ <div class="stat wide" style="background:#fff;color:var(--tx)"><span style="color:var(--mut)">Profit this month</span><b class="${inc-exp<0?'neg':'pos'}">${fmt(round2(inc-exp))}</b></div>
+ <div class="stat"><span>Overdue invoices</span><b class="${od?'neg':''}">${od}</b></div></div>
+ <div class="btns"><button class="btn" style="margin-top:0" onclick="saleForm()">Quick sale</button><button class="btn sec" style="margin-top:0" onclick="txForm('out')">Add expense</button></div>
+ <div class="card" style="margin-top:12px"><h3>Recent activity</h3>${recent.length?recent.map(entryRow).join(''):'<p class="mut">Nothing yet. Tap + to record your first sale or expense.</p>'}</div>`}
+
+const TAGS={in:'Income',out:'Expense',invoice:'Sale',payment:'Payment received',bill:'Purchase',billpay:'Payment made',adjust:'Stock adjustment'};
+const tag=e=>TAGS[e.kind]||'Journal';
+function entryRow(e){const k=e.kind;const cls=(k==='in'||k==='payment')?'pos':(k==='out'||k==='billpay')?'neg':'';const sg=cls==='pos'?'+':cls==='neg'?'−':'';
+ return `<div class="row" onclick="viewEntry('${e.id}')"><div><b>${esc(e.desc||'(no description)')}</b><small>${e.date} · ${tag(e)}</small></div><div class="amt ${cls}">${sg}${fmt(entryAmt(e))}</div></div>`}
+function txList(){const q=V.q.toLowerCase();
+ const l=[...S.entries].filter(e=>!q||(e.desc||'').toLowerCase().includes(q)||e.lines.some(x=>acct(x.acc).name.toLowerCase().includes(q))).sort(byDate).reverse().slice(0,300);
+ return l.length?l.map(entryRow).join(''):'<p class="mut">No entries found.</p>'}
+function jn(){return `<input class="search" placeholder="Search journal…" value="${esc(V.q)}" oninput="V.q=this.value;$('#txl').innerHTML=txList()"><div class="card" id="txl">${txList()}</div>`}
+
+function sales(){const l=[...S.invoices].sort(byDate).reverse().slice(0,300);
+ return `<button class="btn" style="margin:0 0 12px" onclick="saleForm()">+ New sale</button><div class="card"><h3>Sales</h3>${l.length?l.map(i=>{const[s,c]=status(i);return `<div class="row" onclick="viewInv('${i.id}')"><div><b>${esc(i.no)} · ${esc(i.customer)}</b><small>${i.date}</small></div><div style="text-align:end"><div class="amt">${fmt(i.total)}</div><span class="badge ${c}">${s}</span></div></div>`}).join(''):'<p class="mut">No sales yet. Tap + to make one.</p>'}</div>`}
+
+function stock(){const t=V.stk;
+ let h=`<div class="chips"><button class="chip ${t==='items'?'on':''}" onclick="V.stk='items';render()">Items</button><button class="chip ${t==='bills'?'on':''}" onclick="V.stk='bills';render()">Purchases</button></div>`;
+ if(t==='items'){
+  h+=`<button class="btn" style="margin:0 0 12px" onclick="itemForm()">+ New item</button><div class="card"><div class="ln"><span>Stock value</span><b>${fmt(stockValue())}</b></div>`;
+  h+=S.items.length?[...S.items].sort((a,b)=>a.name.localeCompare(b.name)).map(i=>{const q=stockOf(i);return `<div class="row" onclick="viewItem('${i.id}')"><div><b>${esc(i.name)}</b><small>${fmt(i.price)} / ${esc(i.unit||'pcs')}</small></div><div style="text-align:end"><div class="amt ${isLow(i)?'low':''}">${q} ${esc(i.unit||'')}</div>${isLow(i)?'<span class="badge b-od">Low</span>':''}</div></div>`}).join(''):'<p class="mut">No items yet.</p>';
+  h+='</div>'}
+ else{const l=[...S.bills].sort(byDate).reverse();
+  h+=`<button class="btn" style="margin:0 0 12px" onclick="billForm()">+ New purchase</button><div class="card"><h3>Purchases</h3>${l.length?l.map(b=>{const[s,c]=status(b);return `<div class="row" onclick="viewBill('${b.id}')"><div><b>${esc(b.no)} · ${esc(b.supplier)}</b><small>${b.date}</small></div><div style="text-align:end"><div class="amt">${fmt(b.total)}</div><span class="badge ${c}">${s}</span></div></div>`}).join(''):'<p class="mut">No purchases yet.</p>'}</div>`}
+ return h}
+
+function khata(){const k=V.kh;const l=S.parties.filter(p=>p.type===k).sort((a,b)=>a.name.localeCompare(b.name));
+ const tot=round2(l.reduce((t,p)=>t+partyBal(p),0));
+ return `<div class="chips"><button class="chip ${k==='customer'?'on':''}" onclick="V.kh='customer';render()">Customers</button><button class="chip ${k==='supplier'?'on':''}" onclick="V.kh='supplier';render()">Suppliers</button></div>
+ <button class="btn" style="margin:0 0 12px" onclick="partyForm('${k}')">${k==='customer'?'+ New customer':'+ New supplier'}</button>
+ <div class="card"><div class="ln"><span>${k==='customer'?'Owed to you':'You owe suppliers'}</span><b>${fmt(tot)}</b></div>
+ ${l.length?l.map(p=>{const b=partyBal(p);return `<div class="row" onclick="viewParty('${p.id}')"><div><b>${esc(p.name)}</b><small>${esc(p.phone||'')}</small></div><div style="text-align:end" class="amt ${b>0?(k==='customer'?'pos':'neg'):'mut'}">${b>0?fmt(b):'Settled'}<small>${b>0?(k==='customer'?'owes you':'you owe'):''}</small></div></div>`}).join(''):'<p class="mut">Nobody here yet.</p>'}</div>`}
+
+const line=(n,v)=>`<div class="ln"><span>${esc(n)}</span><span>${fmt(v)}</span></div>`;
+const tot=(n,v)=>`<div class="ln tt"><span>${n}</span><span>${fmt(round2(v))}</span></div>`;
+function grp(s,type){let r='',t=0;S.accounts.filter(a=>a.type===type).forEach(a=>{const v=round2(natural(a,s[a.id]));if(v){r+=line(a.name,v);t+=v}});return[r,round2(t)]}
+function pl(){const s=sums(V.to,V.from);const[ir,i]=grp(s,'income'),[er,e]=grp(s,'expense');
+ return `<div class="card"><h3>Profit & Loss</h3><small>${V.from} → ${V.to}</small><h4>Income</h4>${ir||'<p class="mut">None</p>'}${tot('Total income',i)}<h4>Expenses</h4>${er||'<p class="mut">None</p>'}${tot('Total expenses',e)}<div class="tot big ${i-e<0?'neg':'pos'}"><span>${i-e<0?'Net loss':'Net profit'}</span><span>${fmt(round2(i-e))}</span></div></div>`}
+function bs(){const s=sums(V.to);const[ar,A]=grp(s,'asset'),[lr,L]=grp(s,'liability');let[er,E]=grp(s,'equity');
+ let ni=0;S.accounts.forEach(a=>{if(a.type==='income')ni+=natural(a,s[a.id]);if(a.type==='expense')ni-=natural(a,s[a.id])});ni=round2(ni);
+ if(ni){er+=line('Retained earnings (profit to date)',ni);E=round2(E+ni)}
+ const ok=Math.abs(A-L-E)<0.01;
+ return `<div class="card"><h3>Balance Sheet</h3><small>${V.to}</small><h4>Assets</h4>${ar||'<p class="mut">None</p>'}${tot('Total assets',A)}<h4>Liabilities</h4>${lr||'<p class="mut">None</p>'}${tot('Total liabilities',L)}<h4>Equity</h4>${er||'<p class="mut">None</p>'}${tot('Total equity',E)}<div class="tot big ${ok?'pos':'neg'}"><span>Liabilities + equity</span><span>${fmt(round2(L+E))}</span></div>${ok?'':'<p class="neg">Does not balance with assets — check your entries.</p>'}</div>`}
+function tb(){const s=sums(V.to);let r='',D=0,C=0;
+ S.accounts.slice().sort((a,b)=>a.id<b.id?-1:1).forEach(a=>{const o=s[a.id];if(!o)return;const n=round2(o.dr-o.cr);if(!n)return;
+  r+=`<tr><td>${esc(a.name)}</td><td>${n>0?fmt(n):''}</td><td>${n<0?fmt(-n):''}</td></tr>`;if(n>0)D+=n;else C-=n});D=round2(D);C=round2(C);
+ return `<div class="card"><h3>Trial Balance</h3><small>${V.to}</small><table><tr><th>Account</th><th>Debit</th><th>Credit</th></tr>${r||'<tr><td colspan=3 class="mut">—</td></tr>'}<tr><th>Total</th><th>${fmt(D)}</th><th>${fmt(C)}</th></tr></table>${Math.abs(D-C)<0.01?'<p class="pos">✔ Debits equal credits</p>':'<p class="neg">Out of balance</p>'}</div>`}
+function lg(){const a=acct(V.lacc);const sg=isDr(a)?1:-1;let run=0;
+ S.entries.filter(e=>e.date<V.from).forEach(e=>e.lines.forEach(l=>{if(l.acc===a.id)run+=sg*((l.dr||0)-(l.cr||0))}));
+ const open=round2(run);let rows='';
+ S.entries.filter(e=>e.date>=V.from&&e.date<=V.to&&e.lines.some(l=>l.acc===a.id)).sort(byDate).forEach(e=>e.lines.forEach(l=>{if(l.acc!==a.id)return;run+=sg*((l.dr||0)-(l.cr||0));
+  rows+=`<tr><td>${e.date.slice(5)}</td><td>${esc(e.desc)}</td><td>${l.dr?fmt(l.dr):''}</td><td>${l.cr?fmt(l.cr):''}</td><td>${fmt(round2(run))}</td></tr>`}));
+ return `<div class="card"><h3>Ledger</h3><select onchange="V.lacc=this.value;render(true)">${accOpts(()=>true,V.lacc)}</select><small style="margin:6px 0">${V.from} → ${V.to}</small><table><tr><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr><tr><td></td><td class="mut">Opening</td><td></td><td></td><td>${fmt(open)}</td></tr>${rows}</table></div>`}
+function tx(){const inP=d=>d.date>=V.from&&d.date<=V.to;
+ const grpBy=(docs)=>{const m={};docs.filter(inP).forEach(d=>{const k=d.taxPct||0;const o=m[k]||(m[k]={base:0,tax:0});o.base+=d.sub;o.tax+=d.tax});return m};
+ const rows=m=>Object.keys(m).sort((a,b)=>a-b).map(k=>`<tr><td>${k}%</td><td>${fmt(round2(m[k].base))}</td><td>${fmt(round2(m[k].tax))}</td></tr>`).join('')||'<tr><td colspan=3 class="mut">—</td></tr>';
+ const o=grpBy(S.invoices),i=grpBy(S.bills);const O=round2(Object.values(o).reduce((t,x)=>t+x.tax,0)),I=round2(Object.values(i).reduce((t,x)=>t+x.tax,0));
+ return `<div class="card"><h3>Tax</h3><small>${V.from} → ${V.to}</small><h4>Sales tax collected (output)</h4><table><tr><th>Rate</th><th>Taxable sales</th><th>Tax amount</th></tr>${rows(o)}</table><div class="ln tt"><span>Total</span><span>${fmt(O)}</span></div>
+ <h4>Tax paid on purchases (input)</h4><table><tr><th>Rate</th><th>Taxable purchases</th><th>Tax amount</th></tr>${rows(i)}</table><div class="ln tt"><span>Total</span><span>${fmt(I)}</span></div>
+ <div class="tot big"><span>Net tax payable</span><span>${fmt(round2(O-I))}</span></div></div>`}
+function reps(){const t=V.rep;
+ const tabs=[['pl','Profit & Loss'],['bs','Balance Sheet'],['tb','Trial Balance'],['lg','Ledger'],['tx','Tax'],['jn','Journal']];
+ const range=t==='pl'||t==='lg'||t==='tx';
+ let h=`<div class="chips">${tabs.map(([k,n])=>`<button class="chip ${t===k?'on':''}" onclick="V.rep='${k}';render()">${n}</button>`).join('')}</div>`;
+ if(t==='jn')return h+jn();
+ return h+`<div class="card dates">${range?`<label>From<input type="date" value="${V.from}" onchange="V.from=this.value;render(true)"></label>`:''}<label>${range?'To':'As of'}<input type="date" value="${V.to}" onchange="V.to=this.value;render(true)"></label></div>
+ <div id="rep">${{pl,bs,tb,lg,tx}[t]()}</div><button class="btn sec" onclick="printHTML($('#rep').innerHTML)">Print / Save as PDF</button>`}
+
+function more(){const s=S.settings,sy=dev.sync;
+ return `<div class="card"><h3>Language</h3><div class="btns"><button class="btn ${dev.lang==='en'?'':'sec'}" style="margin-top:0" onclick="setLang('en')">English</button><button class="btn ${dev.lang==='ur'?'':'sec'}" style="margin-top:0" onclick="setLang('ur')">اردو</button></div></div>
+ <div class="card"><h3>Business</h3>
+ <label>Business name</label><input id="s-name" value="${esc(s.name)}">
+ <label>Address / phone (shown on invoices)</label><textarea id="s-addr" rows="2">${esc(s.addr)}</textarea>
+ <label>Currency symbol</label><input id="s-cur" value="${esc(s.cur)}">
+ <label>Default sales tax %</label><input id="s-tax" type="number" step="any" inputmode="decimal" value="${s.tax}">
+ <label>Invoice prefix</label><input id="s-pre" value="${esc(s.prefix)}">
+ <button class="btn" onclick="saveSettings()">Save settings</button></div>
+ <div class="card"><h3>Security</h3><button class="btn sec" style="margin-top:0" onclick="pinForm()">Set / change PIN</button>
+ ${dev.pinOn?`<button class="btn sec" onclick="bioEnable()">Enable fingerprint</button><button class="btn red" onclick="ask('Remove PIN?',removePin)">Remove PIN</button>`:''}</div>
+ <div class="card"><h3>Cloud sync</h3><small>Optional. Uses your own Firebase Realtime Database. See README for the 5-minute setup.</small>
+ <label>Database URL</label><input id="y-url" placeholder="https://your-app-default-rtdb.firebaseio.com" value="${esc(sy.url)}">
+ <label>Sync code (keep secret)</label><input id="y-code" value="${esc(sy.code)}">
+ <div class="btns"><button class="btn sec" onclick="$('#y-code').value=uid()+uid()+uid()">Generate code</button><button class="btn" onclick="saveSync()">Save & sync</button></div>
+ ${sy.last?`<small style="margin-top:8px">Last sync: ${new Date(sy.last).toLocaleString()}</small>`:''}</div>
+ <div class="card"><h3>Chart of accounts</h3>${S.accounts.slice().sort((a,b)=>a.id<b.id?-1:1).map(a=>`<div class="row" style="cursor:default"><div><b>${esc(a.name)}</b><small>${a.type}</small></div>${a.sys?'':`<button class="x" style="padding:6px 10px" onclick="delAcct('${a.id}')">×</button>`}</div>`).join('')}
+ <button class="btn sec" onclick="acctForm()">+ Add account</button></div>
+ <div class="card"><h3>Data</h3><p class="mut">Data is stored on this phone. Back it up regularly.</p>
+ <button class="btn" onclick="exportJSON()">Download backup (JSON)</button>
+ <button class="btn sec" onclick="exportCSV()">Export journal (CSV)</button>
+ <label class="btn sec" style="text-align:center;margin-top:12px">Restore from backup<input type="file" accept=".json,application/json" onchange="importJSON(this)" style="display:none"></label>
+ <button class="btn red" onclick="ask('Erase ALL data on this device?',resetAll)">Erase all data</button></div>`}
+const views={home,sales,stock,khata,reps,more};
+
+/* =================== add menu & simple forms =================== */
+function openAdd(){modal(`<h3>Add</h3>
+ <button class="btn" onclick="saleForm()"><span>🧾</span> Sale / invoice</button>
+ <button class="btn" style="background:#4338ca" onclick="billForm()"><span>📦</span> Purchase bill</button>
+ <div class="btns"><button class="btn" style="background:#16a34a" onclick="txForm('in')"><span>💰</span> Income received</button><button class="btn" style="background:#dc2626" onclick="txForm('out')"><span>💸</span> Expense</button></div>
+ <div class="btns"><button class="btn sec" onclick="partyPayForm('customer')"><span>⬇️</span> Receive customer payment</button><button class="btn sec" onclick="partyPayForm('supplier')"><span>⬆️</span> Pay supplier</button></div>
+ <div class="btns"><button class="btn sec" onclick="itemForm()"><span>🏷️</span> New item</button><button class="btn sec" onclick="partyForm('customer')"><span>👤</span> New customer / supplier</button></div>
+ <button class="btn sec" onclick="jForm()"><span>📒</span> Journal entry (debit / credit)</button>`)}
+
+function txForm(kind){const inc=kind==='in';
+ modal(`<h3>${inc?'Record income':'Record expense'}</h3>
+ <label>Amount</label><input id="t-amt" type="number" step="any" inputmode="decimal">
+ <label>${inc?'Income category':'Expense category'}</label><select id="t-cat">${accOpts(a=>a.type===(inc?'income':'expense'),inc?'4100':'5500')}</select>
+ <label>${inc?'Received into':'Paid from'}</label><select id="t-pay">${accOpts(payAccts,'1000')}</select>
+ <label>Date</label><input id="t-date" type="date" value="${today()}">
+ <label>Note</label><input id="t-desc" placeholder="${inc?'e.g. Commission received':'e.g. Shop rent'}">
+ <button class="btn" onclick="saveTx('${kind}')">Save</button>`)}
+function saveTx(kind){const amt=round2(num($('#t-amt').value));if(amt<=0)return toast('Enter an amount');
+ const cat=$('#t-cat').value,pay=$('#t-pay').value,inc=kind==='in';
+ put('entries',{id:uid(),date:$('#t-date').value||today(),desc:$('#t-desc').value.trim()||acct(cat).name,kind,
+  lines:inc?[{acc:pay,dr:amt,cr:0},{acc:cat,dr:0,cr:amt}]:[{acc:cat,dr:amt,cr:0},{acc:pay,dr:0,cr:amt}]});
+ save();closeM();render();toast('Saved')}
+
+function jRow(){return `<div class="jr"><select class="j-acc">${accOpts(()=>true)}</select><input class="j-dr" type="number" step="any" inputmode="decimal" placeholder="Debit" oninput="jTot()"><input class="j-cr" type="number" step="any" inputmode="decimal" placeholder="Credit" oninput="jTot()"><button type="button" class="x" onclick="this.parentNode.remove();jTot()">×</button></div>`}
+function addRow(box,fn){const b=$(box);b.insertAdjacentHTML('beforeend',fn());tr(b.lastElementChild)}
+function jForm(){modal(`<h3>Journal entry</h3><label>Date</label><input id="j-date" type="date" value="${today()}">
+ <label>Description</label><input id="j-desc" placeholder="e.g. Owner invested cash">
+ <label>Lines</label><div id="jl">${jRow()+jRow()}</div>
+ <button class="btn sec" style="margin-top:0" onclick="addRow('#jl',jRow)">+ Add line</button>
+ <div class="diff" id="jd"></div><button class="btn" onclick="saveJ()">Save entry</button>`);jTot()}
+function jRead(){return[...document.querySelectorAll('#jl .jr')].map(r=>({acc:r.querySelector('.j-acc').value,dr:round2(num(r.querySelector('.j-dr').value)),cr:round2(num(r.querySelector('.j-cr').value))})).filter(l=>l.dr||l.cr)}
+function jTot(){const l=jRead();const d=round2(l.reduce((t,x)=>t+x.dr,0)),c=round2(l.reduce((t,x)=>t+x.cr,0));
+ const el=$('#jd');if(el)el.innerHTML=`Debit ${fmt(d)} · Credit ${fmt(c)} · `+(Math.abs(d-c)<0.005&&d>0?'<span class="pos">✔</span>':`<span class="neg">Δ ${fmt(round2(d-c))}</span>`)}
+function saveJ(){const l=jRead();const d=round2(l.reduce((t,x)=>t+x.dr,0)),c=round2(l.reduce((t,x)=>t+x.cr,0));
+ if(l.length<2)return toast('Need at least two lines');
+ if(l.some(x=>x.dr&&x.cr))return toast('A line can’t have both debit and credit');
+ if(d<=0||Math.abs(d-c)>=0.005)return toast('Debits must equal credits');
+ put('entries',{id:uid(),date:$('#j-date').value||today(),desc:$('#j-desc').value.trim()||'Journal entry',kind:'journal',lines:l});
+ save();closeM();render();toast('Saved')}
+function viewEntry(id){const e=S.entries.find(x=>x.id===id);if(!e)return;
+ const refInv=e.ref&&S.invoices.some(i=>i.id===e.ref),refBill=e.ref&&S.bills.some(b=>b.id===e.ref),refItem=e.ref&&S.items.some(i=>i.id===e.ref);
+ modal(`<h3>${esc(e.desc)}</h3><small>${e.date} · ${tag(e)}</small><table style="margin-top:10px"><tr><th>Account</th><th>Debit</th><th>Credit</th></tr>${e.lines.map(l=>`<tr><td>${esc(acct(l.acc).name)}</td><td>${l.dr?fmt(l.dr):''}</td><td>${l.cr?fmt(l.cr):''}</td></tr>`).join('')}</table>
+ ${refInv?`<button class="btn sec" onclick="viewInv('${e.ref}')">Open sale</button>`:refBill?`<button class="btn sec" onclick="viewBill('${e.ref}')">Open purchase</button>`:refItem?`<button class="btn sec" onclick="viewItem('${e.ref}')">Open item</button>`:`<button class="btn red" onclick="ask('Delete this entry?',()=>{rm('entries','${id}');save();render()})">Delete</button>`}
+ <button class="btn sec" onclick="closeM()">Close</button>`)}
+
+/* =================== parties (khata) =================== */
+function partyOpts(type,sel){return S.parties.filter(p=>p.type===type).sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<option value="${p.id}" ${p.id===sel?'selected':''}>${esc(p.name)}</option>`).join('')}
+function partyForm(type,id){const p=id?S.parties.find(x=>x.id===id):null;type=p?p.type:type;
+ modal(`<h3>${p?'Edit':'New'} ${type==='customer'?'customer':'supplier'}</h3><label>Name</label><input id="p-name" value="${esc(p?p.name:'')}">
+ <label>Phone</label><input id="p-phone" type="tel" inputmode="tel" value="${esc(p?p.phone:'')}" placeholder="03xx-xxxxxxx">
+ <label>Type</label><select id="p-type" ${p?'disabled':''}><option value="customer" ${type==='customer'?'selected':''}>Customer</option><option value="supplier" ${type==='supplier'?'selected':''}>Supplier</option></select>
+ <button class="btn" onclick="saveParty('${id||''}')">Save</button>`)}
+function saveParty(id){const n=$('#p-name').value.trim();if(!n)return toast('Enter a name');
+ const p=id?S.parties.find(x=>x.id===id):{id:uid(),type:$('#p-type').value};p.name=n;p.phone=$('#p-phone').value.trim();put('parties',p);save();V.kh=p.type;closeM();render();toast('Saved')}
+function ensureParty(selId,newName,type){if(newName&&newName.trim()){const p=put('parties',{id:uid(),name:newName.trim(),type,phone:''});return p}return selId?S.parties.find(x=>x.id===selId):null}
+function viewParty(id){const p=S.parties.find(x=>x.id===id);if(!p)return;const bal=partyBal(p),cu=p.type==='customer';
+ const docs=partyDocs(p).sort(byDate).reverse();
+ modal(`<h3>${esc(p.name)}</h3><small>${esc(p.phone||'')} · ${cu?'Customer':'Supplier'}</small>
+ <div class="tot big"><span>${cu?'owes you':'you owe'}</span><span class="${bal>0?(cu?'pos':'neg'):''}">${fmt(bal)}</span></div>
+ <table style="margin-top:8px"><tr><th>${cu?'Sale':'Purchase'}</th><th>Total</th><th>Due</th></tr>${docs.map(d=>`<tr onclick="${cu?'viewInv':'viewBill'}('${d.id}')"><td>${esc(d.no)}<small>${d.date}</small></td><td>${fmt(d.total)}</td><td>${fmt(dueOf(d))}</td></tr>`).join('')}</table>
+ ${bal>0.004?`<button class="btn" onclick="partyPayForm('${p.type}','${p.id}')">${cu?'Receive payment':'Pay supplier'}</button>`:''}
+ ${cu&&bal>0.004&&p.phone?`<button class="btn sec" onclick="waRemind('${p.id}')">WhatsApp reminder</button>`:''}
+ <div class="btns"><button class="btn sec" onclick="printHTML(stmtHTML('${p.id}'))">Statement</button><button class="btn sec" onclick="partyForm('${p.type}','${p.id}')">Edit</button></div>
+ ${docs.length?'':`<button class="btn red" onclick="ask('Delete this ${p.type}?',()=>{rm('parties','${p.id}');save();render()})">Delete</button>`}
+ <button class="btn sec" onclick="closeM()">Close</button>`)}
+function waRemind(id){const p=S.parties.find(x=>x.id===id);let ph=(p.phone||'').replace(/[^\d]/g,'');if(ph.startsWith('0'))ph='92'+ph.slice(1);
+ const m=`Assalam o Alaikum ${p.name}, this is a reminder from ${S.settings.name}. Your outstanding balance is ${fmt(partyBal(p))}. Please arrange payment. Thank you.`;
+ openUrl(`https://wa.me/${ph}?text=${encodeURIComponent(m)}`)}
+function stmtHTML(id){const p=S.parties.find(x=>x.id===id);const docs=partyDocs(p).sort(byDate);
+ return `<div class="card"><h2 style="margin:0">${esc(S.settings.name)}</h2><h3>Statement – ${esc(p.name)}</h3><div>${today()}</div><table><tr><th>No.</th><th>Date</th><th>Total</th><th>Paid</th><th>Due</th></tr>${docs.map(d=>`<tr><td>${esc(d.no)}</td><td>${d.date}</td><td>${fmt(d.total)}</td><td>${fmt(paidOf(d))}</td><td>${fmt(dueOf(d))}</td></tr>`).join('')}</table><div class="ln tt"><span>Balance</span><span>${fmt(partyBal(p))}</span></div></div>`}
+function partyPayForm(type,id){const p=id?S.parties.find(x=>x.id===id):null;const cu=type==='customer';
+ modal(`<h3>${cu?'Receive payment':'Pay supplier'}</h3>
+ <label>${cu?'Customer':'Supplier'}</label><select id="pp-p" onchange="ppFill()">${S.parties.filter(x=>x.type===type&&partyBal(x)>0.004).map(x=>`<option value="${x.id}" ${p&&p.id===x.id?'selected':''}>${esc(x.name)} (${fmt(partyBal(x))})</option>`).join('')||'<option value="">—</option>'}</select>
+ <label>Amount</label><input id="pp-amt" type="number" step="any" inputmode="decimal">
+ <label>${cu?'Received into':'Paid from'}</label><select id="pp-acc">${accOpts(payAccts,'1000')}</select>
+ <label>Date</label><input id="pp-date" type="date" value="${today()}">
+ <small style="margin-top:6px">Applied to the oldest open ${cu?'sales':'purchases'} first.</small>
+ <button class="btn" onclick="savePartyPay('${type}')">Save</button>`);ppFill()}
+function ppFill(){const s=$('#pp-p');if(!s||!s.value)return;const p=S.parties.find(x=>x.id===s.value);if(p)$('#pp-amt').value=partyBal(p)}
+function savePartyPay(type){const p=S.parties.find(x=>x.id===$('#pp-p').value);if(!p)return toast('Nobody owes anything');
+ const amt=round2(num($('#pp-amt').value));if(amt<=0)return toast('Enter an amount');if(amt>partyBal(p)+0.004)return toast('More than the balance due');
+ partyPay(p,amt,$('#pp-acc').value,$('#pp-date').value||today());save();closeM();render();toast('Saved')}
+
+/* =================== items =================== */
+function itemForm(id){const it=id?S.items.find(x=>x.id===id):null;const used=it&&moves(it.id).length>0;
+ modal(`<h3>${it?'Edit item':'New item'}</h3><label>Item name</label><input id="m-name" value="${esc(it?it.name:'')}">
+ <div class="dates"><label>Unit (pcs, kg…)<input id="m-unit" value="${esc(it?it.unit:'pcs')}"></label><label>Reorder level<input id="m-re" type="number" step="any" inputmode="decimal" value="${it?it.reorder||'':''}"></label></div>
+ <div class="dates"><label>Cost price<input id="m-cost" type="number" step="any" inputmode="decimal" value="${it?it.cost:''}" ${it?'disabled':''}></label><label>Selling price<input id="m-price" type="number" step="any" inputmode="decimal" value="${it?it.price:''}"></label></div>
+ ${it?'':'<label>Opening stock</label><input id="m-open" type="number" step="any" inputmode="decimal" value="0">'}
+ <button class="btn" onclick="saveItem('${id||''}')">Save</button>`)}
+function saveItem(id){const n=$('#m-name').value.trim();if(!n)return toast('Enter a name');
+ const it=id?S.items.find(x=>x.id===id):{id:uid(),cost:round2(num($('#m-cost').value)),open:round2(num($('#m-open').value))};
+ it.name=n;it.unit=$('#m-unit').value.trim()||'pcs';it.reorder=num($('#m-re').value);it.price=num($('#m-price').value);put('items',it);
+ if(!id&&it.open>0&&it.cost>0)put('entries',{id:uid(),date:today(),desc:'Opening stock – '+n,kind:'journal',ref:it.id,lines:[{acc:'1200',dr:round2(it.open*it.cost),cr:0},{acc:'3000',dr:0,cr:round2(it.open*it.cost)}]});
+ save();V.tab='stock';V.stk='items';closeM();render();toast('Saved')}
+function viewItem(id){const it=S.items.find(x=>x.id===id);if(!it)return;const q=stockOf(it),used=moves(id).length>0;
+ modal(`<h3>${esc(it.name)}</h3><div class="ln"><span>In stock</span><b class="${isLow(it)?'low':''}">${q} ${esc(it.unit)}</b></div><div class="ln"><span>Average cost</span><span>${fmt(avgCost(it))}</span></div><div class="ln"><span>Selling price</span><span>${fmt(it.price)}</span></div><div class="ln tt"><span>Stock value</span><span>${fmt(round2(Math.max(q,0)*avgCost(it)))}</span></div>
+ <div class="btns"><button class="btn" onclick="adjForm('${id}')">Adjust stock</button><button class="btn sec" onclick="itemForm('${id}')">Edit</button></div>
+ ${used?'':`<button class="btn red" onclick="ask('Delete this item?',()=>{rmEntries('${id}');rm('items','${id}');save();render()})">Delete</button>`}<button class="btn sec" onclick="closeM()">Close</button>`)}
+function adjForm(id){const it=S.items.find(x=>x.id===id);
+ modal(`<h3>Adjust stock</h3><small>${esc(it.name)} · ${stockOf(it)} ${esc(it.unit)}</small><label>Quantity change (+/−)</label><input id="a-q" type="number" step="any" inputmode="decimal" placeholder="-2 or 5"><label>Note</label><input id="a-note" placeholder="Damaged, stock count…"><button class="btn" onclick="saveAdj('${id}')">Save</button>`)}
+function saveAdj(id){const it=S.items.find(x=>x.id===id);const q=num($('#a-q').value);if(!q)return toast('Enter an amount');
+ const cost=avgCost(it);const v=round2(Math.abs(q)*cost);const aid=uid();
+ put('adjusts',{id:aid,ts:Date.now(),itemId:id,date:today(),q,cost,note:$('#a-note').value.trim()});
+ if(v>0)put('entries',{id:uid(),date:today(),desc:`Stock adjustment – ${it.name}`,kind:'adjust',ref:aid,lines:q<0?[{acc:'5500',dr:v,cr:0},{acc:'1200',dr:0,cr:v}]:[{acc:'1200',dr:v,cr:0},{acc:'4100',dr:0,cr:v}]});
+ save();closeM();render();toast('Saved')}
+
+/* =================== sale / POS =================== */
+function saleForm(){CART=[];RECV_AUTO=true;
+ modal(`<h3>New sale</h3><input id="s-q" placeholder="Search…" oninput="posGrid()"><div class="pgrid" id="pg"></div>
+ <button class="btn sec" style="margin-top:0" onclick="CART.push({itemId:'',d:'Item',q:1,p:0});cartUI()">+ Custom item</button>
+ <div id="cart"></div>
+ <label>Customer</label><select id="s-party"><option value="">Walk-in customer</option>${partyOpts('customer')}</select>
+ <input id="s-newp" placeholder="…or type a new customer name" style="margin-top:6px">
+ <div class="dates"><label>Date<input id="s-date" type="date" value="${today()}"></label><label>Due<input id="s-due" type="date" value="${addDays(14)}"></label></div>
+ <label>Sales tax %</label><input id="s-tax" type="number" step="any" inputmode="decimal" value="${S.settings.tax}" oninput="cartTot()">
+ <label>Amount received now</label><input id="s-recv" type="number" step="any" inputmode="decimal" oninput="RECV_AUTO=false;cartTot()">
+ <label>Received into</label><select id="s-acc">${accOpts(payAccts,'1000')}</select>
+ <label>Note</label><input id="s-note">
+ <div class="diff" id="s-tot"></div><button class="btn" onclick="saveSale()">Complete sale</button>`);posGrid();cartUI()}
+function posGrid(){const q=($('#s-q').value||'').toLowerCase();
+ const l=S.items.filter(i=>!q||i.name.toLowerCase().includes(q)).sort((a,b)=>a.name.localeCompare(b.name)).slice(0,40);
+ $('#pg').innerHTML=l.length?l.map(i=>`<button class="pi" onclick="addItem('${i.id}')"><b>${esc(i.name)}</b><small>${fmt(i.price)} · ${stockOf(i)}</small></button>`).join(''):'<small>—</small>'}
+function addItem(id){const it=S.items.find(x=>x.id===id);const l=CART.find(x=>x.itemId===id);if(l)l.q++;else CART.push({itemId:id,d:it.name,q:1,p:it.price});
+ const need=CART.find(x=>x.itemId===id).q;if(stockOf(it)<need)toast('Low stock: only '+stockOf(it)+' left');cartUI()}
+function cq(i,d){CART[i].q=Math.max(0,round2(CART[i].q+d));if(CART[i].q===0)CART.splice(i,1);cartUI()}
+function cs(i,k,v){CART[i][k]=k==='d'?v:num(v);cartUI()}
+function cartUI(){const c=$('#cart');if(!c)return;
+ c.innerHTML=CART.length?CART.map((l,i)=>`<div class="cl"><div>${l.itemId?`<b>${esc(l.d)}</b>`:`<input value="${esc(l.d)}" onchange="cs(${i},'d',this.value)">`}</div><div class="cq"><button onclick="cq(${i},-1)">−</button><input type="number" step="any" inputmode="decimal" value="${l.q}" onchange="cs(${i},'q',this.value)"><button onclick="cq(${i},1)">+</button></div><input class="cp" type="number" step="any" inputmode="decimal" value="${l.p}" onchange="cs(${i},'p',this.value)"><button class="x" onclick="CART.splice(${i},1);cartUI()">×</button></div>`).join(''):'<p class="mut">Tap items to add them to the sale.</p>';
+ tr(c);cartTot()}
+function cartTot(){const cal=iCalc(CART.filter(l=>l.q>0),num($('#s-tax')&&$('#s-tax').value));
+ const r=$('#s-recv');if(r&&RECV_AUTO)r.value=cal.total;const recv=r?num(r.value):0;const el=$('#s-tot');
+ if(el)el.innerHTML=`${T('Subtotal')} ${fmt(cal.sub)} · ${T('Tax')} ${fmt(cal.tax)}<br><span style="font-size:18px">${T('Total')} ${fmt(cal.total)}</span>`+(cal.total-recv>0.004?`<br><span class="neg">${T('Balance due')} ${fmt(round2(cal.total-recv))}</span>`:'')}
+function saveSale(){const items=CART.filter(l=>l.q>0);if(!items.length)return toast('Add at least one item');
+ const taxPct=num($('#s-tax').value),c=iCalc(items,taxPct),recv=round2(num($('#s-recv').value));
+ if(recv<0||recv>c.total+0.004)return toast('Received amount is more than the total');
+ const credit=c.total-recv>0.004;const p=ensureParty($('#s-party').value,$('#s-newp').value,'customer');
+ if(credit&&!p)return toast('Choose a customer for the unpaid balance');
+ const inv=createInvoice({partyId:p?p.id:'',customer:p?p.name:'Walk-in',date:$('#s-date').value||today(),due:$('#s-due').value||today(),items,taxPct,note:$('#s-note').value.trim(),recv,payAcc:$('#s-acc').value});
+ save();closeM();V.tab='sales';render();viewInv(inv.id)}
+
+/* =================== invoices view =================== */
+function viewInv(id){const i=S.invoices.find(x=>x.id===id);if(!i)return;const[s,c]=status(i);const d=dueOf(i);
+ modal(`<h3>${esc(i.no)} <span class="badge ${c}">${s}</span></h3><small>${esc(i.customer)} · ${i.date} · ${i.due}</small>
+ <table style="margin-top:10px"><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr>${i.items.map(x=>`<tr><td>${esc(x.d||'Item')}</td><td>${x.q}</td><td>${fmt(x.p)}</td><td>${fmt(round2(x.q*x.p))}</td></tr>`).join('')}</table>
+ <div class="ln" style="margin-top:8px"><span>Subtotal</span><span>${fmt(i.sub)}</span></div>${i.tax?`<div class="ln"><span>Tax (${i.taxPct}%)</span><span>${fmt(i.tax)}</span></div>`:''}
+ <div class="ln tt"><span>Total</span><span>${fmt(i.total)}</span></div>
+ ${i.payments.map(p=>`<div class="ln"><span class="pos">Paid ${p.date}</span><span>${fmt(p.amt)} <a href="#" onclick="event.preventDefault();delPay('inv','${i.id}','${p.id}')" class="neg">✕</a></span></div>`).join('')}
+ <div class="tot big"><span>Balance due</span><span>${fmt(d)}</span></div>
+ ${d>0.004?`<button class="btn" onclick="payForm('inv','${i.id}')">Record payment</button>`:''}
+ <div class="btns"><button class="btn sec" onclick="printHTML(invHTML('${i.id}'))">Print / PDF</button><button class="btn sec" onclick="shareInv('${i.id}')">Share</button></div>
+ <button class="btn red" onclick="ask('Delete this sale and its payments?',()=>delInv('${i.id}'))">Delete invoice</button><button class="btn sec" onclick="closeM()">Close</button>`)}
+function payForm(kind,id){const d=(kind==='inv'?S.invoices:S.bills).find(x=>x.id===id);
+ modal(`<h3>Record payment</h3><small>${esc(d.no)} · ${esc(d.customer||d.supplier)}</small><label>Amount</label><input id="p-amt" type="number" step="any" inputmode="decimal" value="${dueOf(d)}">
+ <label>${kind==='inv'?'Received into':'Paid from'}</label><select id="p-acc">${accOpts(payAccts,'1000')}</select><label>Date</label><input id="p-date" type="date" value="${today()}">
+ <button class="btn" onclick="savePay('${kind}','${id}')">Save payment</button>`)}
+function savePay(kind,id){const d=(kind==='inv'?S.invoices:S.bills).find(x=>x.id===id);const amt=round2(num($('#p-amt').value));
+ if(amt<=0)return toast('Enter an amount');if(amt>dueOf(d)+0.004)return toast('More than the balance due');
+ addPay(kind,d,amt,$('#p-date').value||today(),$('#p-acc').value);save();render();kind==='inv'?viewInv(id):viewBill(id);toast('Saved')}
+function delPay(kind,did,pid){const d=(kind==='inv'?S.invoices:S.bills).find(x=>x.id===did);const p=d.payments.find(x=>x.id===pid);if(!p)return;
+ rm('entries',p.entryId);d.payments=d.payments.filter(x=>x.id!==pid);stamp(d);save();render();kind==='inv'?viewInv(did):viewBill(did)}
+function delInv(id){rmEntries(id);rm('invoices',id);save();closeM();render()}
+function invHTML(id){const i=S.invoices.find(x=>x.id===id);const s=S.settings;
+ return `<div class="card"><h2 style="margin:0">${esc(s.name)}</h2><div style="white-space:pre-line;color:#555">${esc(s.addr)}</div><h3 style="margin-top:16px">INVOICE ${esc(i.no)}</h3>
+ <div>Bill to: <b>${esc(i.customer)}</b></div><div>Date: ${i.date} &nbsp; Due: ${i.due}</div><br>
+ <table><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr>${i.items.map(x=>`<tr><td>${esc(x.d||'Item')}</td><td>${x.q}</td><td>${fmt(x.p)}</td><td>${fmt(round2(x.q*x.p))}</td></tr>`).join('')}</table>
+ <div class="ln"><span>Subtotal</span><span>${fmt(i.sub)}</span></div>${i.tax?`<div class="ln"><span>Tax (${i.taxPct}%)</span><span>${fmt(i.tax)}</span></div>`:''}
+ <div class="ln tt"><span>Total</span><span>${fmt(i.total)}</span></div><div class="ln"><span>Paid</span><span>${fmt(paidOf(i))}</span></div><div class="ln tt"><span>Balance due</span><span>${fmt(dueOf(i))}</span></div>
+ ${i.note?`<p>${esc(i.note)}</p>`:''}<p style="color:#777">Thank you for your business.</p></div>`}
+async function shareInv(id){const i=S.invoices.find(x=>x.id===id);
+ const t=`${S.settings.name}\nInvoice ${i.no}\nCustomer: ${i.customer}\nDate: ${i.date}  Due: ${i.due}\n`+i.items.map(x=>`- ${x.d||'Item'} x${x.q} @ ${fmt(x.p)}`).join('\n')+(i.tax?`\nTax: ${fmt(i.tax)}`:'')+`\nTotal: ${fmt(i.total)}\nBalance due: ${fmt(dueOf(i))}`;
+ const n=native();try{if(n)await n.callHandler('shareText',t);else if(navigator.share)await navigator.share({title:'Invoice '+i.no,text:t});else{await navigator.clipboard.writeText(t);toast('Copied to clipboard')}}catch(e){}}
+
+/* =================== purchase bills =================== */
+function bRow(){return `<div class="ir br"><select class="b-sel" onchange="bSel(this)"><option value="">Expense / other</option>${S.items.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('')}</select><input class="d" placeholder="Description"><select class="b-acc">${accOpts(a=>a.type==='expense','5500')}</select><input class="q" type="number" step="any" inputmode="decimal" placeholder="Qty" value="1" oninput="bTot()"><input class="p" type="number" step="any" inputmode="decimal" placeholder="Cost each" oninput="bTot()"><button type="button" class="x" onclick="this.parentNode.remove();bTot()">×</button></div>`}
+function bSel(sel){const r=sel.parentNode;const it=S.items.find(x=>x.id===sel.value);r.querySelector('.d').style.display=it?'none':'';r.querySelector('.b-acc').style.display=it?'none':'';if(it)r.querySelector('.p').value=avgCost(it)||it.cost||'';bTot()}
+function billForm(){modal(`<h3>New purchase</h3>
+ <label>Supplier</label><select id="b-party"><option value="">No supplier (cash purchase)</option>${partyOpts('supplier')}</select>
+ <input id="b-newp" placeholder="…or type a new supplier name" style="margin-top:6px">
+ <div class="dates"><label>Date<input id="b-date" type="date" value="${today()}"></label><label>Due<input id="b-due" type="date" value="${addDays(14)}"></label></div>
+ <label>Lines</label><div id="bl">${bRow()}</div><button class="btn sec" style="margin-top:0" onclick="addRow('#bl',bRow)">+ Add line</button>
+ <label>Tax paid on purchase %</label><input id="b-tax" type="number" step="any" inputmode="decimal" value="0" oninput="bTot()">
+ <label>Amount paid now</label><input id="b-paid" type="number" step="any" inputmode="decimal" value="0">
+ <label>Paid from</label><select id="b-acc">${accOpts(payAccts,'1000')}</select>
+ <label>Supplier invoice no. (optional)</label><input id="b-ref"><label>Note</label><input id="b-note">
+ <div class="diff" id="b-tot"></div><button class="btn" onclick="saveBill()">Save purchase</button>`);bTot()}
+function bRead(){return[...document.querySelectorAll('#bl .br')].map(r=>{const sel=r.querySelector('.b-sel').value;const it=sel&&S.items.find(x=>x.id===sel);
+ return{itemId:it?it.id:'',d:it?it.name:(r.querySelector('.d').value.trim()||'Expense'),acc:r.querySelector('.b-acc').value,q:num(r.querySelector('.q').value),p:num(r.querySelector('.p').value)}}).filter(x=>x.q>0&&x.p>0)}
+function bTot(){const el=$('#b-tot');if(!el)return;const c=iCalc(bRead(),num($('#b-tax').value));el.innerHTML=`${T('Subtotal')} ${fmt(c.sub)} · ${T('Tax')} ${fmt(c.tax)}<br><span style="font-size:18px">${T('Total')} ${fmt(c.total)}</span>`}
+function saveBill(){const items=bRead();if(!items.length)return toast('Add at least one item');
+ const tp=num($('#b-tax').value),c=iCalc(items,tp),paid=round2(num($('#b-paid').value));
+ if(paid<0||paid>c.total+0.004)return toast('Paid amount is more than the total');
+ const p=ensureParty($('#b-party').value,$('#b-newp').value,'supplier');if(c.total-paid>0.004&&!p)return toast('Choose a supplier for the unpaid balance');
+ const b=createBill({partyId:p?p.id:'',supplier:p?p.name:'Cash purchase',date:$('#b-date').value||today(),due:$('#b-due').value||today(),items,taxPct:tp,paid,payAcc:$('#b-acc').value,ref:$('#b-ref').value.trim(),note:$('#b-note').value.trim()});
+ save();closeM();V.tab='stock';V.stk='bills';render();viewBill(b.id)}
+function viewBill(id){const b=S.bills.find(x=>x.id===id);if(!b)return;const[s,c]=status(b);const d=dueOf(b);
+ modal(`<h3>${esc(b.no)} <span class="badge ${c}">${s}</span></h3><small>${esc(b.supplier)} · ${b.date} · ${b.due}${b.ref?' · #'+esc(b.ref):''}</small>
+ <table style="margin-top:10px"><tr><th>Item</th><th>Qty</th><th>Cost</th><th>Total</th></tr>${b.items.map(x=>`<tr><td>${esc(x.d)}</td><td>${x.q}</td><td>${fmt(x.p)}</td><td>${fmt(round2(x.q*x.p))}</td></tr>`).join('')}</table>
+ <div class="ln" style="margin-top:8px"><span>Subtotal</span><span>${fmt(b.sub)}</span></div>${b.tax?`<div class="ln"><span>Tax (${b.taxPct}%)</span><span>${fmt(b.tax)}</span></div>`:''}
+ <div class="ln tt"><span>Total</span><span>${fmt(b.total)}</span></div>
+ ${b.payments.map(p=>`<div class="ln"><span class="pos">Paid ${p.date}</span><span>${fmt(p.amt)} <a href="#" onclick="event.preventDefault();delPay('bill','${b.id}','${p.id}')" class="neg">✕</a></span></div>`).join('')}
+ <div class="tot big"><span>Balance due</span><span>${fmt(d)}</span></div>
+ ${d>0.004?`<button class="btn" onclick="payForm('bill','${b.id}')">Record payment</button>`:''}
+ <button class="btn red" onclick="ask('Delete this purchase? Stock will go back down.',()=>{rmEntries('${b.id}');rm('bills','${b.id}');save();closeM();render()})">Delete</button><button class="btn sec" onclick="closeM()">Close</button>`)}
+
+/* =================== settings / accounts / data =================== */
+function saveSettings(){const s=S.settings;s.name=$('#s-name').value.trim()||'My Shop';s.addr=$('#s-addr').value;s.cur=$('#s-cur').value.trim()||'Rs';s.tax=num($('#s-tax').value);s.prefix=$('#s-pre').value;s.u=Date.now();save();render(true);toast('Settings saved')}
+function acctForm(){modal(`<h3>New account</h3><label>Name</label><input id="a-name"><label>Type</label><select id="a-type">${['asset','liability','equity','income','expense'].map(t=>`<option>${t}</option>`).join('')}</select><button class="btn" onclick="saveAcct()">Save</button>`)}
+function saveAcct(){const n=$('#a-name').value.trim();if(!n)return toast('Enter a name');put('accounts',{id:uid(),name:n,type:$('#a-type').value});save();closeM();render(true)}
+function delAcct(id){if(S.entries.some(e=>e.lines.some(l=>l.acc===id)))return toast('Account has entries; can’t delete');ask('Delete this account?',()=>{rm('accounts',id);save();render(true)})}
+function dl(name,type,data){const n=native();if(n){n.callHandler('saveFile',name,type,data);return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function exportJSON(){dl(`shopbooks-backup-${today()}.json`,'application/json',JSON.stringify(S))}
+function exportCSV(){const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+ const r=[['Date','Description','Type','Account','Debit','Credit'].join(',')];
+ [...S.entries].sort(byDate).forEach(e=>e.lines.forEach(l=>r.push([e.date,q(e.desc),tag(e),q(acct(l.acc).name),l.dr||'',l.cr||''].join(','))));
+ dl(`shopbooks-journal-${today()}.csv`,'text/csv',r.join('\n'))}
+function importJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(!j.accounts||!j.entries||!j.invoices)throw 0;
+ const nj=norm(j);ask('Replace ALL current data with this backup?',()=>{S=nj;save();render();toast('Backup restored')})}catch(e){toast('Not a valid backup file')}};r.readAsText(f);inp.value=''}
+function resetAll(){S=fresh();save();render();toast('All data erased')}
+
+/* =================== PIN / fingerprint =================== */
+let LOCKED=!!dev.pinOn,PINBUF='',hiddenAt=0;
+async function hashPin(p){const s=dev.salt+':'+p;try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+ catch(e){let h=5381;for(let r=0;r<2000;r++)for(const c of s)h=((h<<5)+h+c.charCodeAt(0))|0;return'f'+h}}
+function lockUI(){const L=$('#lock');if(!LOCKED){L.style.display='none';L.innerHTML='';return}L.style.display='flex';
+ L.innerHTML=`<div class="lk"><h2>${esc(S.settings.name)}</h2><p>Enter PIN</p><div class="dots">${[0,1,2,3].map(i=>`<i class="${i<PINBUF.length?'on':''}"></i>`).join('')}</div><div class="kp">${[1,2,3,4,5,6,7,8,9].map(n=>`<button onclick="kp('${n}')">${n}</button>`).join('')}<button onclick="bioUnlock()">${dev.bio?'👆':''}</button><button onclick="kp('0')">0</button><button onclick="kp('x')">⌫</button></div></div>`;tr(L)}
+async function kp(k){if(k==='x')PINBUF=PINBUF.slice(0,-1);else if(PINBUF.length<4)PINBUF+=k;lockUI();
+ if(PINBUF.length===4){const ok=(await hashPin(PINBUF))===dev.pin;PINBUF='';if(ok){LOCKED=false;lockUI();render()}else{toast('Wrong PIN');lockUI()}}}
+function lockNow(){if(!dev.pinOn)return;LOCKED=true;PINBUF='';lockUI()}
+function pinForm(){modal(`<h3>Set / change PIN</h3><label>New PIN (4 digits)</label><input id="n-pin" type="password" inputmode="numeric" maxlength="4"><label>Repeat PIN</label><input id="n-pin2" type="password" inputmode="numeric" maxlength="4"><small style="margin-top:6px">The PIN stops casual access. Data in the browser is not encrypted.</small><button class="btn" onclick="savePin()">Save</button>`)}
+async function savePin(){const a=$('#n-pin').value,b=$('#n-pin2').value;if(!/^\d{4}$/.test(a))return toast('PIN must be 4 digits');if(a!==b)return toast('PINs do not match');
+ dev.salt=uid()+uid();dev.pin=await hashPin(a);dev.pinOn=true;saveDev();closeM();render(true);toast('Saved')}
+function removePin(){dev.pinOn=false;dev.pin='';dev.bio='';saveDev();render(true)}
+async function bioEnable(){try{const n=native();
+ if(n){if(!(await n.callHandler('biometric')))throw 0;dev.bio='native'}
+ else{const c=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:'ShopBooks'},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'owner',displayName:'Owner'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},timeout:60000}});dev.bio=b64(c.rawId)}
+ saveDev();render(true);toast('Fingerprint enabled')}catch(e){toast('Fingerprint not available here')}}
+async function bioUnlock(){if(!dev.bio)return;try{let ok=false;const n=native();
+ if(dev.bio==='native'&&n)ok=await n.callHandler('biometric');
+ else{await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:unb64(dev.bio)}],userVerification:'required',timeout:60000}});ok=true}
+ if(ok){LOCKED=false;lockUI();render()}}catch(e){toast('Fingerprint failed')}}
+document.addEventListener('visibilitychange',()=>{if(document.hidden){hiddenAt=Date.now();return}
+ if(dev.pinOn&&hiddenAt&&Date.now()-hiddenAt>30000){LOCKED=true;lockUI()}else if(syncCfg())syncNow()});
+
+/* =================== cloud sync (Firebase Realtime Database REST) =================== */
+const syncCfg=()=>!!(dev.sync&&dev.sync.url&&dev.sync.code);
+function mergeDB(a,b){const out=fresh();const del={};
+ [b.del||{},a.del||{}].forEach(d=>{for(const k in d)del[k]=Math.max(del[k]||0,d[k])});out.del=del;
+ for(const c of COLL){const m=new Map();
+  (b[c]||[]).forEach(x=>m.set(x.id,x));
+  (a[c]||[]).forEach(x=>{const o=m.get(x.id);if(!o||(x.u||0)>=(o.u||0))m.set(x.id,x)});
+  out[c]=[...m.values()].filter(x=>!del[x.id])}
+ const sa=a.settings||{},sb=b.settings||{};
+ out.settings=(sa.u||0)>=(sb.u||0)?Object.assign({},baseSettings(),sb,sa):Object.assign({},baseSettings(),sa,sb);
+ out.settings.next=Math.max(sa.next||1,sb.next||1);out.settings.nextBill=Math.max(sa.nextBill||1,sb.nextBill||1);
+ return norm(out)}
+let syncTimer=null,syncing=false;
+function scheduleSync(){if(!syncCfg()||!navigator.onLine)return;clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncNow(false),2500)}
+async function syncNow(manual){if(!syncCfg()||syncing)return;syncing=true;
+ try{const url=dev.sync.url.replace(/\/+$/,'')+'/shopbooks/'+encodeURIComponent(dev.sync.code)+'.json';
+  const r=await fetch(url);if(!r.ok)throw new Error('HTTP '+r.status);const remote=await r.json();
+  if(remote&&remote.accounts)S=mergeDB(S,norm(remote));
+  localStorage.setItem(KEY,JSON.stringify(S));
+  const p=await fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(S)});if(!p.ok)throw new Error('HTTP '+p.status);
+  dev.sync.last=Date.now();saveDev();if(!LOCKED)render(true);if(manual)toast('Synced')}
+ catch(e){if(manual)toast('Sync failed: '+e.message)}finally{syncing=false}}
+function saveSync(){dev.sync.url=$('#y-url').value.trim();dev.sync.code=$('#y-code').value.trim();saveDev();if(!syncCfg())return toast('Enter URL and code');syncNow(true)}
+
+/* =================== start =================== */
+applyLang();lockUI();render();
+if(syncCfg()&&!LOCKED)setTimeout(()=>syncNow(false),800);
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+name: shopbooks
+description: ShopBooks - offline accounting for small shops (Flutter shell around the web app).
+publish_to: "none"
+version: 2.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_inappwebview: ^6.1.5
+  local_auth: ^2.3.0
+  path_provider: ^2.1.5
+  printing: ^5.13.0
+  share_plus: ^10.1.4
+  url_launcher: ^6.3.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/www/
